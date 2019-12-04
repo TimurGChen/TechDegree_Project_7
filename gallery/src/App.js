@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import './images_and_styling/App.css';
 import apiKey from './config.js';
 import {
   BrowserRouter,
