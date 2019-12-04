@@ -13,6 +13,7 @@ import axios from 'axios';
 import Nav from './components/Nav';
 import SearchForm from './components/SearchForm';
 import PhotoContainer from './components/PhotoContainer';
+import Error from './components/Error';
 
 
 
@@ -23,9 +24,13 @@ class App extends Component {
     dogs: [],
     parrots: [],
     searchResult: [],
+    query: "",
+    isLoading: true
   }
 
   componentDidMount() {
+    // request images data for cats, dogs, and parrots and store in state,
+    // so that no request is needed during reloads
     axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=cats&per_page=24&format=json&nojsoncallback=1`)
       .then(response => { this.setState( {cats: response.data.photos.photo} ); })
       .catch(err => { console.log(`Error fetching and parsing data: ${ err }`); });
@@ -37,11 +42,14 @@ class App extends Component {
       .catch(err => { console.log(`Error fetching and parsing data: ${ err }`); });
   }
 
+  // requests images data from flickr.com and update the state of App.js
   performSearch = query => {
     axios.get(`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&format=json&nojsoncallback=1`)
       .then(response => {
         this.setState({
-          searchResult: response.data.photos.photo
+          searchResult: response.data.photos.photo,
+          query: query,
+          isLoading: false
         });
       })
       .catch(err => {
@@ -53,15 +61,15 @@ class App extends Component {
     return (
       <BrowserRouter>
         <div className="container">
-          <Route path="/" render={ () => <SearchForm onSearch={ this.performSearch } /> } />
+          <SearchForm onSearch={ this.performSearch } />
           <Nav />
           <Switch>
             <Route exact path="/" render={ () => <Redirect to="/cats" /> } />
-            <Route path="/cats" render={ () => <PhotoContainer data={ this.state.cats } /> } />
-            <Route path="/dogs" render={ () => <PhotoContainer data={ this.state.dogs } /> } />
-            <Route path="/parrots" render={ () => <PhotoContainer data={ this.state.parrots } /> } />
-            <Route path="/search/:query" render={ () => <PhotoContainer data={ this.state.searchResult } />} />
-            <Route path="/" render={ () => <PhotoContainer />} />
+            <Route exact path="/cats" render={ () => <PhotoContainer data={ this.state.cats } query="cats" isLoading={this.state.isLoading} /> } />
+            <Route exact path="/dogs" render={ () => <PhotoContainer data={ this.state.dogs }  query="dogs" isLoading={this.state.isLoading} /> } />
+            <Route exact path="/parrots" render={ () => <PhotoContainer data={ this.state.parrots } query="parrots" isLoading={this.state.isLoading} /> } />
+            <Route path="/search" render={ () => <PhotoContainer data={ this.state.searchResult } query={ this.state.query } isLoading={this.state.isLoading} />} />
+            <Route path="/" render={ () => <Error />} />
           </Switch>
 
         </div>

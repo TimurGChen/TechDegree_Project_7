@@ -3,10 +3,13 @@ import { Redirect } from "react-router-dom";
 
 class SearchForm extends Component {
 
+    // facilitates redirect
     state = {
         toResult: false
     }
 
+    // change the state of App.js according to the search result
+    // and toggle the toResult state
     handleSubmit = e => {
         e.preventDefault();
         this.props.onSearch(this.query.value);
@@ -17,6 +20,8 @@ class SearchForm extends Component {
 
     render() {
 
+        // programmatically redirects the user to results page, 
+        // and toggles the toResult state to ensure SearchForm is rendered
         if (this.state.toResult === true)  {
             this.setState({
                 toResult: false
